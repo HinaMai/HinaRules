@@ -289,8 +289,8 @@ dns:
 proxy-groups:
   - {name: 默认代理, type: select, include-all: true, proxies: [ 香港自动, 日本自动, 狮城自动, 美国自动, 台湾自动, 韩国自动, 自动选择, 香港节点, 日本节点, 狮城节点, 美国节点, 台湾节点, 韩国节点], <<: *Flight}
   - {name: 自动选择, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "^((?!(直连)).)*$"}
-  - {name: google, type: select, include-all: true, proxies: [ 香港自动, 日本自动, 狮城自动, 美国自动, 台湾自动, 韩国自动, 自动选择, 香港节点, 日本节点, 狮城节点, 美国节点, 台湾节点, 韩国节点], <<: *google}
-  - {name: steam商店, type: select, include-all: true, proxies: [ 香港自动, 日本自动, 狮城自动, 美国自动, 台湾自动, 韩国自动, 自动选择, 香港节点, 日本节点, 狮城节点, 美国节点, 台湾节点, 韩国节点], <<: *steam}
+  - {name: google, type: select, include-all: true, proxies: [ 默认代理, 香港自动, 日本自动, 狮城自动, 美国自动, 台湾自动, 韩国自动, 自动选择, 香港节点, 日本节点, 狮城节点, 美国节点, 台湾节点, 韩国节点], <<: *google}
+  - {name: steam商店, type: select, include-all: true, proxies: [ 默认代理, 香港自动, 日本自动, 狮城自动, 美国自动, 台湾自动, 韩国自动, 自动选择, 香港节点, 日本节点, 狮城节点, 美国节点, 台湾节点, 韩国节点], <<: *steam}
   - {name: 香港节点, type: select, include-all: true, <<: *hk1, <<: *hk}
   - {name: 日本节点, type: select, include-all: true, <<: *jp1, <<: *jp}
   - {name: 狮城节点, type: select, include-all: true, <<: *sg1, <<: *sg}
