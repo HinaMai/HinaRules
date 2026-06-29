@@ -290,6 +290,7 @@ proxy-groups:
   - {name: 默认代理, type: select, include-all: true, proxies: [ 香港自动, 日本自动, 狮城自动, 美国自动, 台湾自动, 韩国自动, 自动选择, 香港节点, 日本节点, 狮城节点, 美国节点, 台湾节点, 韩国节点], <<: *Flight}
   - {name: 自动选择, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "^((?!(直连)).)*$"}
   - {name: google, type: select, include-all: true, proxies: [ 香港自动, 日本自动, 狮城自动, 美国自动, 台湾自动, 韩国自动, 自动选择, 香港节点, 日本节点, 狮城节点, 美国节点, 台湾节点, 韩国节点], <<: *google}
+  - {name: steam商店, type: select, include-all: true, proxies: [ 香港自动, 日本自动, 狮城自动, 美国自动, 台湾自动, 韩国自动, 自动选择, 香港节点, 日本节点, 狮城节点, 美国节点, 台湾节点, 韩国节点], <<: *steam}
   - {name: 香港节点, type: select, include-all: true, <<: *hk1, <<: *hk}
   - {name: 日本节点, type: select, include-all: true, <<: *jp1, <<: *jp}
   - {name: 狮城节点, type: select, include-all: true, <<: *sg1, <<: *sg}
@@ -310,15 +311,17 @@ proxy-groups:
 
 # 规则匹配
 rules:
+# 规则集引用
+  - RULE-SET,google_domain,google
+  - RULE-SET,steam@cn_domain,直连 #steam下载
+  - RULE-SET,steam_domain,steam商店 
+
   - RULE-SET,private_ip,直连,no-resolve
   - RULE-SET,private_domain,直连
   - RULE-SET,proxylite, 默认代理
   - RULE-SET,geolocation-!cn, 默认代理
   - RULE-SET,cn_domain,直连
   - RULE-SET,cn_ip,直连
-# 规则集引用
-  - RULE-SET,google_domain,google
-
 
 # 漏网之鱼
   - MATCH,漏网之鱼
@@ -337,8 +340,8 @@ rule-providers:
   cn_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs"}
 # 应用规则集
   google_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.mrs"}
-
-  
+  steam_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam.mrs"}
+  steam@cn_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam@cn.mrs"}
   #ip
   private_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/private.mrs"}
   cn_ip: { <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs"}
