@@ -14,7 +14,7 @@
 2、建议同步到本地，便于阅读
 3、Icons地址请使用raw地址
 
-        例如：https://raw.githubusercontent.com/Vbaethon/HOMOMIX/main/Icon/China.png
+        例如：https://raw.githubusercontent.com/HinaMai/HinaRules/main/Icon/China.png
 
 #### 4、面板可以调节尺寸与距离
 
