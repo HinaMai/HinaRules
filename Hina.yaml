@@ -14,7 +14,6 @@ proxy-providers:
     url: "https://hinamai.cc.cd/sub?token=b8f9f6269c7e5543439b17fcabf83be7"
     type: http
     interval: 86400
-    ##健康检测
     health-check:
       enable: true
       url: https://www.gstatic.com/generate_204
@@ -322,8 +321,8 @@ rules:
   - GEOIP,lan,直连,no-resolve #局域网
   - RULE-SET,steam@cn_domain,直连 #steam下载
   - RULE-SET,steam_domain,steam商店 #steam商店
-  - RULE-SET,netflix_domain,netflix #奈飞
-  - RULE-SET,netflix_ip,netflix #奈飞
+  - RULE-SET,netflix_domain,Netflix #奈飞
+  - RULE-SET,netflix_ip,Netflix #奈飞
 
   - RULE-SET,google_domain,google #谷歌
   - RULE-SET,private_ip,直连,no-resolve #私有ip
@@ -350,9 +349,9 @@ rule-providers:
   google_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.mrs"}
   steam_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam.mrs"}
   steam@cn_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam@cn.mrs"}
-  netflix_domain:  { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.list"}
+  netflix_domain:  { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.mrs"}
   #ip
   private_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/private.mrs"}
   cn_ip: { <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs"}
   # 应用规则集
-  netflix_ip: { <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/netflix.list"}
+  netflix_ip: { <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/netflix.mrs"}
