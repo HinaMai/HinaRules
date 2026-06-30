@@ -296,7 +296,7 @@ proxy-groups:
   - {name: google, <<: *pr, include-all: true, <<: *google}
   - {name: steam商店, <<: *pr, include-all: true, <<: *steam}
   - {name: Netflix, <<: *pr, include-all: true, <<: *netflix_b}
-   #分隔,下面是地区分组
+   #地区分组
   - {name: 香港手动, type: select, include-all: true, <<: *hk1, <<: *hk}
   - {name: 日本手动, type: select, include-all: true, <<: *jp1, <<: *jp}
   - {name: 狮城手动, type: select, include-all: true, <<: *sg1, <<: *sg}
@@ -317,7 +317,6 @@ proxy-groups:
 
 # 规则匹配
 rules:
-# 规则集引用
   - GEOIP,lan,直连,no-resolve #局域网
   - RULE-SET,steam@cn_domain,直连 #steam下载
   - RULE-SET,steam_domain,steam商店 #steam商店
