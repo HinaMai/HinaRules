@@ -296,6 +296,7 @@ proxy-groups:
   - {name: google, <<: *pr, include-all: true, <<: *google}
   - {name: steam商店, <<: *pr, include-all: true, <<: *steam}
   - {name: Netflix, <<: *pr, include-all: true, <<: *netflix_b}
+  - {name: bilibili, <<: *pr, include-all: true, <<: *bilibili}
    #地区分组
   - {name: 香港手动, type: select, include-all: true, <<: *hk1, <<: *hk}
   - {name: 日本手动, type: select, include-all: true, <<: *jp1, <<: *jp}
@@ -322,6 +323,8 @@ rules:
   - RULE-SET,steam_domain,steam商店 #steam商店
   - RULE-SET,netflix_domain,Netflix #奈飞
   - RULE-SET,netflix_ip,Netflix #奈飞
+  - RULE-SET,bilibili_domain,bilibili #哔哩哔哩
+  - RULE-SET,bilibili_ip,bilibili #哔哩哔哩
 
   - RULE-SET,google_domain,google #谷歌
   - RULE-SET,private_ip,直连,no-resolve #私有ip
@@ -349,8 +352,10 @@ rule-providers:
   steam_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam.mrs"}
   steam@cn_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam@cn.mrs"}
   netflix_domain:  { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.mrs"}
+  bilibili_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bilibili.mrs"}
   #ip
   private_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/private.mrs"}
   cn_ip: { <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs"}
-  # 应用规则集
+  # 应用ip规则集
   netflix_ip: { <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/netflix.mrs"}
+  bilibili_ip: { <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/bilibili.mrs"}
