@@ -324,9 +324,9 @@ proxy-groups:
 rules:
   - DOMAIN-SUFFIX,bestcf.cmliussss.hidns.vip,直连 #在线优选
   - DOMAIN-SUFFIX,hinamai.cc.cd,直连 #edgetunnel
+  - SRC-IP-CIDR,192.168.1.9/32,直连 #服务器全局直连
   
   - GEOIP,lan,直连,no-resolve #局域网
-  - RULE-SET,AWAvenue-Ads-Rule-Clash,广告拦截 #广告
   - RULE-SET,category-ads-all,广告拦截 #广告
   - RULE-SET,steam@cn_domain,直连 #steam下载
   - RULE-SET,steam_domain,steam商店 #steam商店
@@ -352,7 +352,6 @@ rule-anchor:
   class: &class {type: http, interval: 86400, behavior: classical, format: text}
 rule-providers: 
   fakeipfilter_domain: {<<: *domain, url: "https://raw.githubusercontent.com/wwqgtxx/clash-rules/release/fakeip-filter.mrs"}
-  AWAvenue-Ads-Rule-Clash: { <<: *domain, url: "https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Clash.mrs"}
   category-ads-all: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ads-all.mrs"}
   private_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs"}
   proxylite: { <<: *class, url: "https://raw.githubusercontent.com/qichiyuhub/rule/refs/heads/main/rules/proxy.list"}
