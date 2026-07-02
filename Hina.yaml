@@ -100,7 +100,7 @@ dns:
     - https://dns.alidns.com/dns-query
 ######### 锚点 start #######
 # 策略组相关
-pr: &pr {type: select, proxies: [ 默认代理, 直连, 自动选择, 香港自动, 日本自动, 狮城自动, 美国自动, 台湾自动, 韩国自动, 自动选择, 香港手动, 日本手动, 狮城手动, 美国手动, 台湾手动, 韩国手动]}
+pr: &pr {type: select, proxies: [ 默认代理, 直连, 自动选择, 香港自动, 日本自动, 狮城自动, 美国自动, 台湾自动, 韩国自动, 其他自动, 自动选择, 香港手动, 日本手动, 狮城手动, 美国手动, 台湾手动, 韩国手动, 其他手动]}
 #这里是订阅更新和延迟测试相关的
 p: &p {type: http, interval: 3600, health-check: {enable: true, url: "https://www.gstatic.com/generate_204", interval: 300}}
 #图标
@@ -283,20 +283,22 @@ p: &p {type: http, interval: 3600, health-check: {enable: true, url: "https://ww
   tw1: &tw1 {filter: "(?=.*(台|TW|(?i)Taiwan))^((?!(港|日|韩|新|美)).)*$"}
   hk1: &hk1 {filter: "(?=.*(港|HK|(?i)Hong Kong))^((?!(日|台|韩|新|美)).)*$"}
   kr1: &kr1 {filter: "(?=.*(韩|KR|(?i)Korea))^((?!(港|日|台|新|美)).)*$"}
-  sg1: &sg1 {filter: "(?=.*(狮|SG|(?i)Singapore))^((?!(港|日|台|韩|美)).)*$"}
+  sg1: &sg1 {filter: "(?=.*(新|狮|SG|(?i)Singapore))^((?!(港|日|台|韩|美)).)*$"}
   us1: &us1 {filter: "(?=.*(美|US|(?i)USA))^((?!(港|日|台|韩|新)).)*$"}
+  other1: &other1 {filter: "^((?!(港|HK|(?i)Hong Kong|台|TW|(?i)Taiwan|日|JP|(?i)Japan|韩|KR|(?i)Korea|新加坡|狮|SG|(?i)Singapore|美|US|(?i)USA)).)*$"}
 ######### 锚点 end #######
 
 # 出站策略，根据自己情况调整每个策略里分组排序，增删都可以，比如把美国自动放到第一个，比如删除香港故转，注意别漏掉表情逗号等。
 # 如果相应分组没有筛选到对应的国家，请根据自己手动名字调整筛选关键字。
 # 没有再使用锚点，是考虑很多新手修改难度，这样新手修改某个分组更容易些。
 proxy-groups:
-  - {name: 默认代理, type: select, include-all: true, proxies: [ 自动选择, 直连, 香港自动, 日本自动, 狮城自动, 美国自动, 台湾自动, 韩国自动, 自动选择, 香港手动, 日本手动, 狮城手动, 美国手动, 台湾手动, 韩国手动], <<: *Flight}
+  - {name: 默认代理, type: select, include-all: true, proxies: [ 自动选择, 直连, 香港自动, 日本自动, 狮城自动, 美国自动, 台湾自动, 韩国自动, 其他自动, 自动选择, 香港手动, 日本手动, 狮城手动, 美国手动, 台湾手动, 韩国手动, 其他手动], <<: *Flight}
   - {name: 自动选择, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "^((?!(直连)).)*$"}
   - {name: google, <<: *pr, include-all: true, <<: *google}
   - {name: steam商店, <<: *pr, include-all: true, <<: *steam}
   - {name: Netflix, <<: *pr, include-all: true, <<: *netflix_b}
   - {name: bilibili, <<: *pr, include-all: true, <<: *bilibili}
+  - {name: 广告拦截, type: select, proxies: [ REJECT, 直连, 默认代理 ], <<: *adblock}
    #地区分组
   - {name: 香港手动, type: select, include-all: true, <<: *hk1, <<: *hk}
   - {name: 日本手动, type: select, include-all: true, <<: *jp1, <<: *jp}
@@ -304,6 +306,7 @@ proxy-groups:
   - {name: 美国手动, type: select, include-all: true, <<: *us1, <<: *us}
   - {name: 台湾手动, type: select, include-all: true, <<: *tw1, <<: *tw}
   - {name: 韩国手动, type: select, include-all: true, <<: *kr1, <<: *kr}
+  - {name: 其他手动, type: select, include-all: true, <<: *other1, <<: *other}
 #  - {name: 香港故转, type: fallback, include-all: true, interval: 300, filter: *hk1, <<: *hk}
 #  - {name: 日本故转, type: fallback, include-all: true, interval: 300, filter: *jp1, <<: *jp}
 #  - {name: 狮城故转, type: fallback, include-all: true, interval: 300, filter: *sg1, <<: *sg}
@@ -314,11 +317,13 @@ proxy-groups:
   - {name: 美国自动, type: url-test, include-all: true, tolerance: 20, interval: 300, <<: *us1, <<: *us}
   - {name: 台湾自动, type: url-test, include-all: true, tolerance: 20, interval: 300, <<: *tw1, <<: *tw}
   - {name: 韩国自动, type: url-test, include-all: true, tolerance: 20, interval: 300, <<: *kr1, <<: *kr}
-  - {name: 漏网之鱼, type: select, include-all: true, proxies: [ 自动选择, 香港自动, 日本自动, 狮城自动, 美国自动, 台湾自动, 韩国自动, 香港手动, 日本手动, 狮城手动, 美国手动, 台湾手动, 韩国手动], <<: *Fish}
+  - {name: 其他自动, type: url-test, include-all: true, tolerance: 20, interval: 300, <<: *other1, <<: *other}
+  - {name: 漏网之鱼, type: select, include-all: true, proxies: [ 自动选择, 香港自动, 日本自动, 狮城自动, 美国自动, 台湾自动, 韩国自动, 其他自动, 香港手动, 日本手动, 狮城手动, 美国手动, 台湾手动, 韩国手动, 其他手动], <<: *Fish}
 
 # 规则匹配
 rules:
   - GEOIP,lan,直连,no-resolve #局域网
+  - RULE-SET,category-ads-all,广告拦截
   - RULE-SET,steam@cn_domain,直连 #steam下载
   - RULE-SET,steam_domain,steam商店 #steam商店
   - RULE-SET,netflix_domain,Netflix #奈飞
@@ -343,6 +348,7 @@ rule-anchor:
   class: &class {type: http, interval: 86400, behavior: classical, format: text}
 rule-providers: 
   fakeipfilter_domain: {<<: *domain, url: "https://raw.githubusercontent.com/wwqgtxx/clash-rules/release/fakeip-filter.mrs"}
+  category-ads-all: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ads-all.mrs"}
   private_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs"}
   proxylite: { <<: *class, url: "https://raw.githubusercontent.com/qichiyuhub/rule/refs/heads/main/rules/proxy.list"}
   geolocation-!cn: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.mrs"}
