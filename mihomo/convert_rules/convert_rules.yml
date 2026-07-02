@@ -1,0 +1,231 @@
+name: Auto Convert Clash Rules to MRS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'mihomo/Not converted/**'
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  convert-rules:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # 授予 action 修改仓库内容的权限
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Install dependencies (jq, curl, wget)
+        run: sudo apt-get update && sudo apt-get install -y jq curl wget
+
+      - name: Install Mihomo
+        run: |
+          # 增加版本选择的健壮性，优先选择 compatible 版本
+          MIHOMO_LATEST_URL=$(curl -s "https://api.github.com/repos/MetaCubeX/mihomo/releases/latest" | jq -r '.assets[] | select(.name | contains("linux-amd64-compatible")) | .browser_download_url')
+          
+          # 如果没有 compatible 版本，则选择一个通用的版本作为备用
+          if [ -z "$MIHOMO_LATEST_URL" ]; then
+            MIHOMO_LATEST_URL=$(curl -s "https://api.github.com/repos/MetaCubeX/mihomo/releases/latest" | jq -r '[.assets[] | select(.name | contains("linux-amd64") and endswith(".gz"))] | .[0].browser_download_url')
+          fi
+
+          echo "Downloading Mihomo from $MIHOMO_LATEST_URL"
+          
+          # 下载、解压、赋予执行权限并移动到系统路径
+          wget -qO mihomo.gz "$MIHOMO_LATEST_URL"
+          gunzip mihomo.gz
+          chmod +x mihomo
+          sudo mv mihomo /usr/local/bin/
+          
+          # 验证安装成功
+          echo "Mihomo version:"
+          mihomo -v
+
+      - name: Process and Convert Rules
+        id: process_rules
+        run: |
+          set -e # 如果任何命令失败，则立即退出
+
+          # --- 全局变量和初始化 ---
+          INPUT_DIR="mihomo/Not converted"
+          OUTPUT_DIR="mihomo/Output"
+
+          # 确保输出目录干净，仅保留最新的转换规则
+          rm -rf "$OUTPUT_DIR"
+          mkdir -p "$OUTPUT_DIR"
+          
+          # 运行摘要计数器
+          declare -i total_processed=0
+          declare -i total_succeeded=0
+          declare -i total_failed=0
+          declare -i total_skipped=0
+
+          # --- 函数定义 ---
+
+          # 函数：转换规则并保存
+          convert_and_commit_rule() {
+              local type="$1"
+              local format="$2"
+              local input_file="$3"
+              local base_name="$4"
+              local output_dir="$5"
+
+              local success=false
+
+              if [[ "$type" == "classical" ]]; then
+                  local output_file="$output_dir/${base_name}.list"
+                  cp "$input_file" "$output_file"
+                  echo "  Archived classical rules to ${output_file}"
+                  success=true
+              else
+                  local output_file="$output_dir/${base_name}.mrs"
+                  local input_for_mihomo="$input_file"
+                  local temp_clean_input="cleaned_for_mrs.tmp"
+
+                  if [[ "$format" == "text" ]]; then
+                      # 使用更健壮的 awk 命令，正确处理带后缀的 IP-CIDR 和各类 DOMAIN 规则
+                      awk -F, '
+                          !/^#/ && !/^[ \t\r\n]*$/ {
+                              if (NF > 1) { print $2; } else { print $0; }
+                          }
+                      ' "$input_file" > "$temp_clean_input"
+                      input_for_mihomo="$temp_clean_input"
+                  fi
+
+                  echo "  Converting: Type=${type}, Format=${format}"
+                  if mihomo convert-ruleset "$type" "$format" "$input_for_mihomo" "$output_file"; then
+                      echo "  Successfully ran mihomo conversion."
+                      success=true
+                  else
+                      echo "  Error: Mihomo command failed for ${input_file}."
+                  fi
+                  if [[ "$format" == "text" ]]; then rm -f "$temp_clean_input"; fi
+              fi
+
+              if [[ "$success" == true && -s "$output_file" ]]; then
+                  total_succeeded+=1
+              elif [[ "$success" == true ]]; then
+                  total_failed+=1
+                  echo "  Warning: Generated file is empty, conversion likely failed silently. Skipping."
+              else
+                  total_failed+=1
+              fi
+          }
+
+          # 函数：拆分 .list/.txt 或已解析的 .yaml 文件并转换
+          split_and_convert() {
+              local input_file="$1"
+              local base_name="$2"
+              local output_dir="$3"
+              local file_type="$4" # "yaml" or "text"
+
+              echo "  Splitting ${file_type} file into domain/ipcidr/other..."
+              
+              local domain_file="${base_name}_domain.tmp"
+              local ipcidr_file="${base_name}_ipcidr.tmp"
+              local other_file="${base_name}_other.tmp"
+              > "$domain_file"; > "$ipcidr_file"; > "$other_file"
+              
+              local awk_script='
+                  function strip(s) {
+                      sub(/^[ \t\r\n]+/, "", s);
+                      sub(/[ \t\r\n]+$/, "", s);
+                      return s;
+                  }
+                  # 主逻辑
+                  {
+                      line = strip($0);
+                      if (index(line, ",")) {
+                          prefix = toupper(substr(line, 1, index(line, ",") - 1));
+                          prefix = strip(prefix);
+                          if (prefix == "DOMAIN" || prefix == "DOMAIN-SUFFIX" || prefix == "DOMAIN-KEYWORD") {
+                              print line >> "'"$domain_file"'";
+                          } else if (prefix == "IP-CIDR" || prefix == "IP-CIDR6") {
+                              print line >> "'"$ipcidr_file"'";
+                          } else {
+                              print line >> "'"$other_file"'";
+                          }
+                      } else {
+                          # 不带逗号的行默认为域名
+                          print line >> "'"$domain_file"'";
+                      }
+                  }
+              '
+              
+              if [[ "$file_type" == "yaml" ]]; then
+                  # 从 payload: 开始解析，并移除 yaml 的 list 格式
+                  sed -n '/payload:/,$p' "$input_file" | sed -e '1d' -e "s/^[ \t-]*'//;s/'$//" -e 's/^[ \t-]*"//;s/"$//' -e 's/^[ \t-]*//' | awk "$awk_script"
+              else # text
+                  awk '!/^#/ && !/^[ \t\r\n]*$/' "$input_file" | awk "$awk_script"
+              fi
+
+              if [ -s "$domain_file" ]; then
+                  convert_and_commit_rule "domain" "text" "$domain_file" "${base_name}_domain" "$output_dir"
+              fi
+              if [ -s "$ipcidr_file" ]; then
+                  convert_and_commit_rule "ipcidr" "text" "$ipcidr_file" "${base_name}_ipcidr" "$output_dir"
+              fi
+              if [ -s "$other_file" ]; then
+                  convert_and_commit_rule "classical" "text" "$other_file" "${base_name}_other" "$output_dir"
+              fi
+              
+              rm -f "$domain_file" "$ipcidr_file" "$other_file"
+          }
+
+          # --- 主逻辑 ---
+          if [ -d "$INPUT_DIR" ]; then
+              # 使用 nullglob 避免没有文件时循环执行一次
+              shopt -s nullglob
+              for file in "$INPUT_DIR"/*; do
+                  filename=$(basename "$file")
+                  extension="${filename##*.}"
+                  base_name="${filename%.*}"
+                  
+                  # 清洗文件名，仅保留字母、数字、_、-、.
+                  sanitized_base=$(echo "$base_name" | sed 's/[^a-zA-Z0-9_.-]//g')
+                  
+                  echo "---"
+                  echo "Processing: $filename (extension: $extension)"
+                  total_processed+=1
+                  
+                  if [[ "$extension" == "yaml" || "$extension" == "yml" ]]; then
+                      split_and_convert "$file" "$sanitized_base" "$OUTPUT_DIR" "yaml"
+                  elif [[ "$extension" == "txt" || "$extension" == "list" ]]; then
+                      split_and_convert "$file" "$sanitized_base" "$OUTPUT_DIR" "text"
+                  else
+                      total_skipped+=1
+                      echo "  Warning: Unsupported file extension '.${extension}', skipping."
+                  fi
+              done
+              shopt -u nullglob
+          else
+              echo "Error: Input directory $INPUT_DIR does not exist."
+              exit 1
+          fi
+          
+          echo "--- Processing complete ---"
+          
+          # --- 打印运行摘要 ---
+          echo "--- Run Summary ---"
+          echo "Rules Processed: $total_processed"
+          echo "Rules Succeeded: $total_succeeded"
+          echo "Rules Skipped: $total_skipped"
+          echo "Rules Failed: $total_failed"
+
+      - name: Commit and Push to repository
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add mihomo/Output/
+          
+          if git diff --staged --quiet; then
+            echo "No file changes to commit."
+          else
+            git commit -m "feat(rules): auto convert rules [skip ci]"
+            git push
+          fi

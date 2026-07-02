@@ -322,6 +322,9 @@ proxy-groups:
 
 # 规则匹配
 rules:
+  - DOMAIN-SUFFIX,bestcf.cmliussss.hidns.vip,直连 #在线优选
+  - DOMAIN-SUFFIX,hinamai.cc.cd,直连 #edgetunnel
+
   - GEOIP,lan,直连,no-resolve #局域网
   - RULE-SET,AWAvenue-Ads-Rule-Clash,广告拦截 #广告
   - RULE-SET,category-ads-all,广告拦截 #广告
