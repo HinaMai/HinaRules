@@ -25,7 +25,7 @@ proxies:
     type: vmess
     server: vps.hina.us.ci
     port: 443
-    uuid: Hina
+    uuid: 4cb966dd-9ede-46ea-821b-c4cb683cb0d9
     alterId: 0
     cipher: auto
     udp: true
