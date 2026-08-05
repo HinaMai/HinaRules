@@ -1,26 +1,44 @@
 # 机场订阅
 proxy-providers:
-  Airport1:
-    url: "https://proxyinfo.net/api/v1/client/subscribe?token=86f973017ab906dde59e659f65f7d09f"
-    type: http
-    interval: 86400
+#  Airport1:
+#    url: "https://proxyinfo.net/api/v1/client/subscribe?token=86f973017ab906dde59e659f65f7d09f"
+#    type: http
+#    interval: 86400
     ##健康检测
-    health-check:
-      enable: true
-      url: https://www.gstatic.com/generate_204
-      interval: 300
-    proxy: 直连
-  Airport2:
-    url: "https://hinamai.cc.cd/sub?token=b8f9f6269c7e5543439b17fcabf83be7"
-    type: http
-    interval: 86400
-    health-check:
-      enable: true
-      url: https://www.gstatic.com/generate_204
-      interval: 300
-    proxy: 直连
+#    health-check:
+#      enable: true
+#      url: https://www.gstatic.com/generate_204
+#      interval: 300
+#    proxy: 直连
+#   Airport2:
+#    url: "https://hinamai.cc.cd/sub?token=b8f9f6269c7e5543439b17fcabf83be7"
+#    type: http
+#    interval: 86400
+#    health-check:
+#      enable: true
+#      url: https://www.gstatic.com/generate_204
+#      interval: 300
+#    proxy: 直连
 #手动节点
 proxies:
+  - name: 自建美国1
+    type: vmess
+    server: vps.hina.us.ci
+    port: 443
+    uuid: Hina
+    alterId: 0
+    cipher: auto
+    udp: true
+    tls: true
+    skip-cert-verify: false
+    servername: vps.hina.us.ci
+    network: ws
+    ws-opts:
+      path: "/hinamai"
+      headers:
+        Host: vps.hina.us.ci
+    client-fingerprint: chrome
+
   - {name: 直连, type: direct}
 
 # 全局配置 
@@ -298,6 +316,7 @@ proxy-groups:
   - {name: steam商店, <<: *pr, include-all: true, <<: *steam}
   - {name: Netflix, <<: *pr, include-all: true, <<: *netflix_b}
   - {name: bilibili, <<: *pr, include-all: true, <<: *bilibili}
+  - {name: github, <<: *pr, include-all: true, <<: *github}
   - {name: 广告拦截, type: select, proxies: [ REJECT, 直连, 默认代理 ], <<: *adblock}
    #地区分组
   - {name: 香港手动, type: select, include-all: true, <<: *hk1, <<: *hk}
@@ -323,8 +342,8 @@ proxy-groups:
 # 规则匹配
 rules:
   - DOMAIN-SUFFIX,bestcf.cmliussss.hidns.vip,直连 #在线优选
+  - DOMAIN-SUFFIX,vps.hina.us.ci,直连 #自建节点
   - DOMAIN-SUFFIX,hinamai.cc.cd,直连 #edgetunnel
-  - SRC-IP-CIDR,192.168.1.9/32,直连 #服务器全局直连
   
   - GEOIP,lan,直连,no-resolve #局域网
   - RULE-SET,category-ads-all,广告拦截 #广告
@@ -334,6 +353,7 @@ rules:
   - RULE-SET,netflix_ip,Netflix #奈飞
   - RULE-SET,bilibili_domain,bilibili #哔哩哔哩
   - RULE-SET,bilibili_ip,bilibili #哔哩哔哩
+  - RULE-SET,github_domain,github #github
 
   - RULE-SET,google_domain,google #谷歌
   - RULE-SET,private_ip,直连,no-resolve #私有ip
@@ -363,6 +383,7 @@ rule-providers:
   steam@cn_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam@cn.mrs"}
   netflix_domain:  { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.mrs"}
   bilibili_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bilibili.mrs"}
+  github_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/github.mrs" }
   #ip
   private_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/private.mrs"}
   cn_ip: { <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs"}
