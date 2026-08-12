@@ -1,15 +1,15 @@
 # 机场订阅
 proxy-providers:
-#  Airport1:
-#    url: "https://proxyinfo.net/api/v1/client/subscribe?token=86f973017ab906dde59e659f65f7d09f"
-#    type: http
-#    interval: 86400
+  Airport1:
+    url: "https://vps.hina.us.ci:2096/HinaMai/Hina"
+    type: http
+    interval: 86400
     ##健康检测
-#    health-check:
-#      enable: true
-#      url: https://www.gstatic.com/generate_204
-#      interval: 300
-#    proxy: 直连
+    health-check:
+      enable: true
+      url: https://www.gstatic.com/generate_204
+      interval: 300
+    proxy: 直连
 #   Airport2:
 #    url: "https://hinamai.cc.cd/sub?token=b8f9f6269c7e5543439b17fcabf83be7"
 #    type: http
@@ -21,24 +21,24 @@ proxy-providers:
 #    proxy: 直连
 #手动节点
 proxies:
-  - name: Hina美国
-    type: vmess
-    server: vps.hina.us.ci
-    port: 443
-    uuid: 4cb966dd-9ede-46ea-821b-c4cb683cb0d9
-    alterId: 0
-    cipher: auto
-    udp: true
-    tls: true
-    skip-cert-verify: false
-    servername: vps.hina.us.ci
-    network: ws
-    ws-opts:
-      path: "/hinamai"
-      headers:
-        Host: vps.hina.us.ci
-    client-fingerprint: chrome
-
+#  - name: Hina美国
+#    type: vmess
+#    server: vps.hina.us.ci
+#    port: 443
+#    uuid: 4cb966dd-9ede-46ea-821b-c4cb683cb0d9
+#    alterId: 0
+#    cipher: auto
+#    udp: true
+#    tls: true
+#    skip-cert-verify: false
+#    servername: vps.hina.us.ci
+#    network: ws
+#    ws-opts:
+#      path: "/hinamai"
+#      headers:
+#        Host: vps.hina.us.ci
+#    client-fingerprint: chrome
+#
   - {name: 直连, type: direct}
 
 # 全局配置 
