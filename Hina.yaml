@@ -317,6 +317,7 @@ proxy-groups:
   - {name: Netflix, <<: *pr, include-all: true, <<: *netflix_b}
   - {name: bilibili, <<: *pr, include-all: true, <<: *bilibili}
   - {name: github, <<: *pr, include-all: true, <<: *github}
+  - {name: 微软, <<: *pr, include-all: true, <<: *microsoft}
   - {name: 广告拦截, type: select, proxies: [ REJECT, 直连, 默认代理 ], <<: *adblock}
    #地区分组
   - {name: 香港手动, type: select, include-all: true, <<: *hk1, <<: *hk}
@@ -356,6 +357,8 @@ rules:
   - RULE-SET,github_domain,github #github
 
   - RULE-SET,google_domain,google #谷歌
+  - RULE-SET,microsoft@cn_domain,直连 #微软国内
+  - RULE-SET,microsoft_domain,微软 #微软
   - RULE-SET,private_ip,直连,no-resolve #私有ip
   - RULE-SET,private_domain,直连 #私有域名
   - RULE-SET,proxylite, 默认代理 #住宅
@@ -379,6 +382,8 @@ rule-providers:
   cn_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs"}
 # 应用规则集
   google_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.mrs"}
+  microsoft_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft.mrs"}
+  microsoft@cn_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft@cn.mrs"}
   steam_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam.mrs"}
   steam@cn_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam@cn.mrs"}
   netflix_domain:  { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.mrs"}
