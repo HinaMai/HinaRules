@@ -102,7 +102,7 @@ dns:
   enhanced-mode: fake-ip
   fake-ip-range: 28.0.0.1/8
   fake-ip-filter:
-    - "*"
+    - "+.hina.us.ci"    # 添加这一行（放行你的域名及其所有子域名，不走虚拟IP）
     - "+.lan"
     - "+.local"
   default-nameserver: ##后备dns服务器
@@ -343,7 +343,7 @@ proxy-groups:
 # 规则匹配
 rules:
   - DOMAIN-SUFFIX,bestcf.cmliussss.hidns.vip,直连 #在线优选
-  - DOMAIN-SUFFIX,vps.hina.us.ci,直连 #自建节点
+  - DOMAIN-SUFFIX,hina.us.ci,直连 #自建节点
   - DOMAIN-SUFFIX,hinamai.cc.cd,直连 #edgetunnel
   
   - GEOIP,lan,直连,no-resolve #局域网
