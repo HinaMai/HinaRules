@@ -338,7 +338,7 @@ proxy-groups:
   - {name: 台湾自动, type: url-test, include-all: true, tolerance: 20, interval: 300, <<: *tw1, <<: *tw}
   - {name: 韩国自动, type: url-test, include-all: true, tolerance: 20, interval: 300, <<: *kr1, <<: *kr}
   - {name: 其他自动, type: url-test, include-all: true, tolerance: 20, interval: 300, <<: *other1, <<: *other}
-  - {name: 漏网之鱼, type: select, include-all: true, proxies: [ 自动选择, 香港自动, 日本自动, 狮城自动, 美国自动, 台湾自动, 韩国自动, 其他自动, 香港手动, 日本手动, 狮城手动, 美国手动, 台湾手动, 韩国手动, 其他手动], <<: *Fish}
+  - {name: 漏网之鱼, <<: *pr, include-all: true, <<: *Fish}
 
 # 规则匹配
 rules:
