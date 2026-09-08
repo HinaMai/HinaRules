@@ -354,7 +354,6 @@ rules:
   - RULE-SET,netflix_domain,Netflix #奈飞
   - RULE-SET,netflix_ip,Netflix #奈飞
   - RULE-SET,bilibili_domain,bilibili #哔哩哔哩
-  - RULE-SET,bilibili_ip,bilibili #哔哩哔哩
   - RULE-SET,github_domain,github #github
 
   - RULE-SET,google_domain,google #谷歌
@@ -395,4 +394,3 @@ rule-providers:
   cn_ip: { <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs"}
   # 应用ip规则集
   netflix_ip: { <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/netflix.mrs"}
-  bilibili_ip: { <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/bilibili.mrs"}
