@@ -342,10 +342,11 @@ proxy-groups:
 
 # 规则匹配
 rules:
+  - SRC-IP-CIDR,192.168.1.240/28,直连 #特定网段直连(192.168.1.240-255)
   - DOMAIN-SUFFIX,bestcf.cmliussss.hidns.vip,直连 #在线优选
   - DOMAIN-SUFFIX,hina.us.ci,直连 #自建节点
   - DOMAIN-SUFFIX,hinamai.cc.cd,直连 #edgetunnel
-  
+
   - GEOIP,lan,直连,no-resolve #局域网
   - RULE-SET,category-ads-all,广告拦截 #广告
   - RULE-SET,steam@cn_domain,直连 #steam下载
