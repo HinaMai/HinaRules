@@ -118,7 +118,7 @@ dns:
     - https://dns.alidns.com/dns-query
 ######### 锚点 start #######
 # 策略组相关
-pr: &pr {type: select, proxies: [ 默认代理, 直连, 自动选择, 香港自动, 日本自动, 狮城自动, 美国自动, 台湾自动, 韩国自动, 其他自动, 自动选择, 香港手动, 日本手动, 狮城手动, 美国手动, 台湾手动, 韩国手动, 其他手动]}
+pr: &pr {type: select, proxies: [ 故障转移, 默认代理, 直连, 自动选择, 香港自动, 日本自动, 狮城自动, 美国自动, 台湾自动, 韩国自动, 其他自动, 香港手动, 日本手动, 狮城手动, 美国手动, 台湾手动, 韩国手动, 其他手动]}
 #这里是订阅更新和延迟测试相关的
 p: &p {type: http, interval: 3600, health-check: {enable: true, url: "https://www.gstatic.com/generate_204", interval: 300}}
 #图标
@@ -310,7 +310,8 @@ p: &p {type: http, interval: 3600, health-check: {enable: true, url: "https://ww
 # 如果相应分组没有筛选到对应的国家，请根据自己手动名字调整筛选关键字。
 # 没有再使用锚点，是考虑很多新手修改难度，这样新手修改某个分组更容易些。
 proxy-groups:
-  - {name: 默认代理, type: select, include-all: true, proxies: [ 自动选择, 直连, 香港自动, 日本自动, 狮城自动, 美国自动, 台湾自动, 韩国自动, 其他自动, 自动选择, 香港手动, 日本手动, 狮城手动, 美国手动, 台湾手动, 韩国手动, 其他手动], <<: *Flight}
+  - {name: 默认代理, type: select, include-all: true, proxies: [ 自动选择, 直连, 香港自动, 日本自动, 狮城自动, 美国自动, 台湾自动, 韩国自动, 其他自动, 香港手动, 日本手动, 狮城手动, 美国手动, 台湾手动, 韩国手动, 其他手动], <<: *Flight}
+  - {name: 故障转移, type: fallback, proxies: [ 默认代理, 自动选择 ], interval: 300, url: "https://www.gstatic.com/generate_204", <<: *failover}
   - {name: 自动选择, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "^((?!(直连)).)*$"}
   - {name: google, <<: *pr, include-all: true, <<: *google}
   - {name: steam商店, <<: *pr, include-all: true, <<: *steam}
@@ -361,8 +362,8 @@ rules:
   - RULE-SET,microsoft_domain,微软 #微软
   - RULE-SET,private_ip,直连,no-resolve #私有ip
   - RULE-SET,private_domain,直连 #私有域名
-  - RULE-SET,proxylite, 默认代理 #住宅
-  - RULE-SET,geolocation-!cn, 默认代理 #定位服务
+  - RULE-SET,proxylite, 故障转移 #住宅
+  - RULE-SET,geolocation-!cn, 故障转移 #定位服务
   - RULE-SET,cn_domain,直连 #cn域名
   - RULE-SET,cn_ip,直连,no-resolve #cnip
 # 漏网之鱼
